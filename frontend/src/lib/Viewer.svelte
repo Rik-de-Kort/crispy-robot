@@ -1,9 +1,78 @@
 <script lang="ts">
     import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    import { onMount} from "svelte";
+    import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+    import {onMount} from "svelte";
 
     let canvas: HTMLCanvasElement;
+
+    class CraneModel {
+        group: THREE.Group
+        material: THREE.MeshBasicMaterial
+        // Having trouble with getting camera right so base is nice and low.
+        // Instead just shifting all objects.
+        Y_SHIFT: number
+
+        constructor(bodyHeight: number) {
+            this.Y_SHIFT = -bodyHeight / 2;
+            this.group = new THREE.Group()
+            this.material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+            const bodyGeometry = new THREE.BoxGeometry(1, bodyHeight, 1);
+            const body = new THREE.Mesh(bodyGeometry, this.material);
+
+            const baseRotation = THREE.MathUtils.degToRad(0);
+            body.position.set(0, bodyHeight / 2 - 0.5 + this.Y_SHIFT, 0);
+            upperArm.setRotationFromEuler(new THREE.Euler(0, Math.PI - baseRotation, 0));
+
+            const upperArmLength = 3;
+            const armPartGeometry = new THREE.BoxGeometry(upperArmLength, 1, 1);
+            const upperArm = new THREE.Mesh(armPartGeometry, this.material);
+            // Todo: figure out some internal representation for this relative stuff
+            // Rotation happens in the xz-plane, meaning y won't change.
+            // At 0 degrees, this is position (1, 0), a segment of length 1.
+            // As we rotate, the center goes along the unit circle, i.e.
+            // [x, y, z] = [cos(alpha), y, sin(alpha)]
+            // To compensate for the thing flying around
+            // object.rotation.y = pi-alpha
+            upperArm.position.set(Math.cos(baseRotation), 4 + this.Y_SHIFT, Math.sin(baseRotation));
+            upperArm.setRotationFromEuler(new THREE.Euler(0, Math.PI - baseRotation, 0));
+
+            const lowerArm = new THREE.Mesh(armPartGeometry, this.material);
+            upperArm.position.multiplyScalar(1.8)
+            lowerArm.position.set(3, 3 + this.Y_SHIFT, 0);
+
+            const wristGeometry = new THREE.BoxGeometry(1.25, 2, 1.25);
+            const wrist = new THREE.Mesh(wristGeometry, this.material);
+            wrist.position.set(4, 1.5 + this.Y_SHIFT, 0);
+
+            const jawGeometry = new THREE.BoxGeometry(3, 0.25, 0.25);
+            const jaw = new THREE.Mesh(jawGeometry, this.material);
+            jaw.position.set(5, 0.45 + this.Y_SHIFT, 0);
+
+            this.group.add(body, upperArm, lowerArm, wrist, jaw);
+        }
+
+        get body() {
+            return this.group.children[0];
+        }
+
+        get upperArm() {
+            return this.group.children[1];
+        }
+
+        get lowerArm() {
+            return this.group.children[2];
+        }
+
+        get wrist() {
+            return this.group.children[3];
+        }
+
+        get jaw() {
+            return this.group.children[4];
+        }
+    }
+
+    let crane = new CraneModel(12);
 
     onMount(() => {
         const scene = new THREE.Scene();
@@ -14,40 +83,15 @@
             1000,
         )
         camera.position.z = 10;
-        // Having trouble with getting camera right so base is nice and low. Brute-forcing with YSHIFT.
-        const YSHIFT = -6;
-        const renderer = new THREE.WebGLRenderer({ canvas });
+        const renderer = new THREE.WebGLRenderer({canvas});
         renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 
-        let controls = new OrbitControls( camera, renderer.domElement );
-        controls.addEventListener( 'change', function() { renderer.render(scene, camera); } );
+        let controls = new OrbitControls(camera, renderer.domElement);
+        controls.addEventListener('change', function () {
+            renderer.render(scene, camera);
+        });
 
-        const bodyHeight = 12;
-        const meshMaterial = new THREE.MeshBasicMaterial({color: 0x00ff00});
-        const bodyGeometry = new THREE.BoxGeometry(1, bodyHeight, 1);
-        const body = new THREE.Mesh(bodyGeometry, meshMaterial);
-        body.position.set(0, bodyHeight/2-0.5 + YSHIFT, 0);
-        scene.add(body);
-
-        const armPartGeometry = new THREE.BoxGeometry(3, 1, 1);
-        const upperArm = new THREE.Mesh(armPartGeometry, meshMaterial);
-        // Todo: figure out some internal representation for this relative stuff
-        upperArm.position.set(1, 4 + YSHIFT, 0);
-        scene.add(upperArm);
-
-        const lowerArm = new THREE.Mesh(armPartGeometry, meshMaterial);
-        lowerArm.position.set(3, 3 + YSHIFT, 0);
-        scene.add(lowerArm);
-
-        const wristGeometry  = new THREE.BoxGeometry(1.25, 2, 1.25);
-        const wrist = new THREE.Mesh(wristGeometry, meshMaterial);
-        wrist.position.set(4, 1.5 + YSHIFT, 0);
-        scene.add(wrist);
-
-        const jawGeometry = new THREE.BoxGeometry(3, 0.25, 0.25);
-        const jaw = new THREE.Mesh(jawGeometry, meshMaterial);
-        jaw.position.set(5, 0.45 + YSHIFT, 0);
-        scene.add(jaw);
+        scene.add(crane.group);
 
         function animate() {
             requestAnimationFrame(animate);
@@ -73,7 +117,7 @@
 <style>
     canvas {
         display: block;
-        width: 600px;
+        width: 800px;
         height: 800px;
         border: 1px solid blue;
     }
