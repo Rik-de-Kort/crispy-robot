@@ -19,8 +19,10 @@
             const bodyGeometry = new THREE.BoxGeometry(1, bodyHeight, 1);
             const body = new THREE.Mesh(bodyGeometry, this.material);
 
-            const baseRotation = THREE.MathUtils.degToRad(0);
+            const baseRotation = THREE.MathUtils.degToRad(45);
             body.position.set(0, bodyHeight / 2 - 0.5 + this.Y_SHIFT, 0);
+
+            const liftHeight = 10;
 
             const upperArmLength = 3;
             const armPartGeometry = new THREE.BoxGeometry(upperArmLength, 1, 1);
@@ -32,7 +34,7 @@
             // [x, y, z] = [cos(alpha), y, sin(alpha)]
             // To compensate for the thing flying around
             // object.rotation.y = pi-alpha
-            upperArm.position.set(Math.cos(baseRotation), 4 + this.Y_SHIFT, Math.sin(baseRotation));
+            upperArm.position.set(Math.cos(baseRotation), liftHeight + this.Y_SHIFT, Math.sin(baseRotation));
             upperArm.setRotationFromEuler(new THREE.Euler(0, Math.PI - baseRotation, 0));
 
             // To rotate the lower arm, we have a similar setup, with the
@@ -62,18 +64,19 @@
             );
             wrist.setRotationFromEuler(new THREE.Euler(0, Math.PI - baseRotation - armRotation - wristRotation));
 
-            // Attachment point for the jaw is the same as wrist, just lower.
+            // Attachment point for the gripper is the same as wrist, just lower.
             // Again, center inscribes a unit circle on top of this.
-            const jawGeometry = new THREE.BoxGeometry(3, 0.25, 0.25);
-            const jaw = new THREE.Mesh(jawGeometry, this.material);
-            jaw.position.set(
-                wrist.position.x + Math.cos(wristRotation + armRotation + baseRotation),
+            const gripperExtension = 2;
+            const gripperGeometry = new THREE.BoxGeometry(1 + gripperExtension, 0.25, 0.25);
+            const gripper = new THREE.Mesh(gripperGeometry, this.material);
+            gripper.position.set(
+                wrist.position.x + gripperExtension * Math.cos(wristRotation + armRotation + baseRotation),
                 wrist.position.y - 1.05,
-                wrist.position.z + Math.sin(wristRotation + armRotation + baseRotation),
+                wrist.position.z + gripperExtension * Math.sin(wristRotation + armRotation + baseRotation),
             )
-            jaw.setRotationFromEuler(new THREE.Euler(0, Math.PI - baseRotation - armRotation - wristRotation));
+            gripper.setRotationFromEuler(new THREE.Euler(0, Math.PI - baseRotation - armRotation - wristRotation));
 
-            this.group.add(body, upperArm, lowerArm, wrist, jaw);
+            this.group.add(body, upperArm, lowerArm, wrist, gripper);
         }
     }
 
