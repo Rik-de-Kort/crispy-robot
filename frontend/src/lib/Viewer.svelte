@@ -21,7 +21,6 @@
 
             const baseRotation = THREE.MathUtils.degToRad(0);
             body.position.set(0, bodyHeight / 2 - 0.5 + this.Y_SHIFT, 0);
-            upperArm.setRotationFromEuler(new THREE.Euler(0, Math.PI - baseRotation, 0));
 
             const upperArmLength = 3;
             const armPartGeometry = new THREE.BoxGeometry(upperArmLength, 1, 1);
@@ -36,9 +35,19 @@
             upperArm.position.set(Math.cos(baseRotation), 4 + this.Y_SHIFT, Math.sin(baseRotation));
             upperArm.setRotationFromEuler(new THREE.Euler(0, Math.PI - baseRotation, 0));
 
+            // To rotate the lower arm, we have a similar setup, with the
+            // difference that it rotates an offset unit circle.
+            // We take the joint to be twice as far from the origin as
+            // the center of the upper arm. Some careful drawing gives the
+            // formulas below.
+            const armRotation = THREE.MathUtils.degToRad(90);
             const lowerArm = new THREE.Mesh(armPartGeometry, this.material);
-            upperArm.position.multiplyScalar(1.8)
-            lowerArm.position.set(3, 3 + this.Y_SHIFT, 0);
+            lowerArm.position.set(
+                upperArm.position.x * 2 + Math.cos(armRotation + baseRotation),
+                upperArm.position.y - 1,  // Shift one unit below
+                upperArm.position.z * 2 + Math.sin(armRotation + baseRotation),
+            );
+            lowerArm.setRotationFromEuler(new THREE.Euler(0, Math.PI - baseRotation - armRotation, 0));
 
             const wristGeometry = new THREE.BoxGeometry(1.25, 2, 1.25);
             const wrist = new THREE.Mesh(wristGeometry, this.material);
@@ -49,26 +58,6 @@
             jaw.position.set(5, 0.45 + this.Y_SHIFT, 0);
 
             this.group.add(body, upperArm, lowerArm, wrist, jaw);
-        }
-
-        get body() {
-            return this.group.children[0];
-        }
-
-        get upperArm() {
-            return this.group.children[1];
-        }
-
-        get lowerArm() {
-            return this.group.children[2];
-        }
-
-        get wrist() {
-            return this.group.children[3];
-        }
-
-        get jaw() {
-            return this.group.children[4];
         }
     }
 
