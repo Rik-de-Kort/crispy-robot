@@ -1,39 +1,28 @@
 <script lang="ts">
-  let toSend: string = $state("");
-  let received: string | null = $state(null);
+    import {Direction} from "./CraneCommand";
+    import CommandButtons from "./CommandButtons.svelte";
 
-  let { craneState = $bindable() } = $props();
-  $inspect(craneState);
+    let {craneState = $bindable()} = $props();
 
-  // Todo: handle errors on websocket creation
-  const ws = new WebSocket('ws://localhost:8080');
-  ws.onmessage = (ev) => {
-    console.log(ev);
-    received = ev.data;
-    craneState = JSON.parse(ev.data);
-  };
-
-  function sendMsg() {
-    ws.send(toSend);
-    toSend = '';
-  }
-
-  function changeCrane() {
-    console.log('changing crane???');
-    craneState = {
-      swing_rotation: 0,
-      lift_elevation: 1000,
-      elbow_rotation: 45,
-      wrist_rotation: 0,
-      gripper_open: 0,
+    // Todo: handle errors on websocket creation
+    const ws = new WebSocket('ws://localhost:8080');
+    ws.onmessage = (ev) => {
+        craneState = JSON.parse(ev.data);
     };
-  }
+
+    function sendCommand(type: string, direction: Direction, amount: number) {
+        // Todo: would like to move this into the command buttons maybe
+        const cmd = /Rotate.*/.test(type)
+            ? {type: type, direction: direction, degrees: amount}
+            : {type: type, direction: direction, millimeters: amount};
+        console.log({cmd});
+        console.log(JSON.stringify(cmd));
+        ws.send(JSON.stringify(cmd));
+    }
 </script>
 
-<button onclick={changeCrane}>click</button>
-<input type="text" bind:value={toSend} placeholder="type here" />
-
-<button onclick={sendMsg}>Send message!</button>
-{#if received !== null}
-  <p>Answer: {received}</p>
-{/if}
+<CommandButtons name="RotateSwing" step={3} {sendCommand}/>
+<CommandButtons name="MoveLift" step={10} {sendCommand}/>
+<CommandButtons name="RotateElbow" step={3} {sendCommand}/>
+<CommandButtons name="RotateWrist" step={3} {sendCommand}/>
+<CommandButtons name="MoveGripper" step={10} {sendCommand}/>

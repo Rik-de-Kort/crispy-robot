@@ -2,7 +2,7 @@
     import * as THREE from 'three';
     import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
     import {onMount} from "svelte";
-    import {CraneModel} from "./crane";
+    import {CraneModel} from "./CraneModel";
 
     let canvas: HTMLCanvasElement;
     let crane = new CraneModel();

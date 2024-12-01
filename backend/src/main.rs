@@ -95,8 +95,8 @@ impl CraneState {
             },
             CraneCommand::MoveGripper { direction, millimeters} => {
                 match direction {
-                    Direction::Positive => self.lift_elevation += millimeters,
-                    Direction::Negative => self.lift_elevation -= millimeters,
+                    Direction::Positive => self.gripper_open += millimeters,
+                    Direction::Negative => self.gripper_open -= millimeters,
                 }
             },
         }
@@ -115,11 +115,9 @@ enum CraneCommand {
     RotateSwing{direction: Direction, degrees: Degrees},
     MoveLift{direction: Direction, millimeters: Millimeters},
     RotateElbow{direction: Direction, degrees: Degrees},
-    MoveGripper{direction: Direction, millimeters: Millimeters},
     RotateWrist{direction: Direction, degrees: Degrees},
+    MoveGripper{direction: Direction, millimeters: Millimeters},
 }
-
-// {"type": "RotateSwing", "direction": "Positive", "degrees": 45}
 
 type Crane = Arc<Mutex<CraneState>>;
 
@@ -179,7 +177,6 @@ async fn accept_connection(stream: TcpStream, crane: Crane) -> Result<()> {
                                         let mut crane_state = crane.lock().unwrap();
                                         crane_state.execute(cmd);
                                     }
-                                    write.send("Got your command!".into()).await?;
                                 }
                                 Err(e) => {
                                     error!("{:?}", e);
