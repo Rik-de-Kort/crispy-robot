@@ -1,19 +1,19 @@
 import * as THREE from "three";
 
 export interface CraneState {
-    baseRotation: number, // degrees
-    liftHeight: number, // mm
-    armRotation: number, // degrees
-    wristRotation: number, // degrees
-    gripperExtension: number, // mm
+    swing_rotation: number, // degrees
+    lift_elevation: number, // mm
+    elbow_rotation: number, // degrees
+    wrist_rotation: number, // degrees
+    gripper_open: number, // mm
 }
 
 export const INITIAL_STATE = {
-    baseRotation: 45,
-    liftHeight: 500,
-    armRotation: 90,
-    wristRotation: 45,
-    gripperExtension: 300,
+    swing_rotation: 45,
+    lift_elevation: 500,
+    elbow_rotation: 90,
+    wrist_rotation: 45,
+    gripper_open: 300,
 }
 
 export class CraneModel {
@@ -77,11 +77,11 @@ export class CraneModel {
     convertDegrees = this.converter(0, 360, 0, 2*Math.PI);
 
     update(state: CraneState) {
-        const baseRotation = this.convertDegrees(state.baseRotation);
-        const liftHeight = this.convertLiftUnit(state.liftHeight);
-        const armRotation = this.convertDegrees(state.armRotation);
-        const wristRotation = this.convertDegrees(state.wristRotation);
-        const gripperExtension = this.convertGripperUnit(state.gripperExtension);
+        const baseRotation = this.convertDegrees(state.swing_rotation);
+        const liftHeight = this.convertLiftUnit(state.lift_elevation);
+        const armRotation = this.convertDegrees(state.elbow_rotation);
+        const wristRotation = this.convertDegrees(state.wrist_rotation);
+        const gripperExtension = this.convertGripperUnit(state.gripper_open);
 
         // Make sure body is set in middle of frame
         this.body.position.set(0, this.bodyHeight / 2 - 0.5 + this.Y_SHIFT, 0);

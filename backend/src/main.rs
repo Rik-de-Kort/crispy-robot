@@ -14,12 +14,13 @@ struct Millimeters(u64); // Max is 1.95 light years, should fit
 #[derive(Serialize, Deserialize, Debug)]
 struct Degrees(u16); // Modulo 360
 
-// CraneState fits in 2*64 + 2*16 = 160 bytes
+// CraneState fits in 2*64 + 3*16 = 176 bits
 #[derive(Serialize, Deserialize, Debug)]
 struct CraneState {
     swing_rotation: Degrees,
-    elbow_rotation: Degrees,
     lift_elevation: Millimeters,
+    elbow_rotation: Degrees,
+    wrist_rotation: Degrees,
     gripper_open: Millimeters,
 }
 

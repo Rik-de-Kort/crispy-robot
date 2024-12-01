@@ -40,11 +40,11 @@
 
     function changeCrane() {
         crane.update({
-            baseRotation: 0,
-            liftHeight: 1000,
-            armRotation: 45,
-            wristRotation: 0,
-            gripperExtension: 0,
+            swing_rotation: 0,
+            lift_elevation: 1000,
+            elbow_rotation: 45,
+            wrist_rotation: 0,
+            gripper_open: 0,
         })
     }
 </script>
