@@ -8,7 +8,6 @@
 </script>
 
 <main>
-  <h1>Websockets!</h1>
   <Controller bind:craneState />
   <Viewer {craneState} />
 </main>
