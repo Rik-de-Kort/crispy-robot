@@ -149,9 +149,6 @@
 
         function animate() {
             requestAnimationFrame(animate);
-
-            // column.rotation.x += 0.01;
-            // column.rotation.y += 0.01;
             controls.update();
 
             renderer.render(scene, camera);
@@ -162,10 +159,20 @@
         return () => {
             renderer.dispose();
         }
-
     });
+
+    function changeCrane() {
+        crane.update({
+            baseRotation: 0,
+            liftHeight: 1000,
+            armRotation: 45,
+            wristRotation: 0,
+            gripperExtension: 0,
+        })
+    }
 </script>
 
+<button on:click={changeCrane}>click</button>
 <canvas bind:this={canvas}></canvas>
 
 <style>
