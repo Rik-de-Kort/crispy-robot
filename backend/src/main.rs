@@ -163,7 +163,8 @@ async fn accept_connection(stream: TcpStream, crane: Crane) -> Result<()> {
     info!("New WebSocket connection: {}", addr);
 
     let (mut write, mut read) = ws_stream.split();
-    let mut interval = tokio::time::interval(Duration::from_millis(1000));
+    // 16 ms for 60 fps :)
+    let mut interval = tokio::time::interval(Duration::from_millis(16));
     loop {
         tokio::select! {
             msg = read.next() => {
