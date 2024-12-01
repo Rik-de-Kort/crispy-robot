@@ -49,13 +49,29 @@
             );
             lowerArm.setRotationFromEuler(new THREE.Euler(0, Math.PI - baseRotation - armRotation, 0));
 
+            // The wrist center inscribes a unit circle with a slightly larger
+            //  radius than the lower arm. Since the wrist is centered around
+            //  the wrist joint, the position doesn't change when it rotates.
+            const wristRotation = THREE.MathUtils.degToRad(60);
             const wristGeometry = new THREE.BoxGeometry(1.25, 2, 1.25);
             const wrist = new THREE.Mesh(wristGeometry, this.material);
-            wrist.position.set(4, 1.5 + this.Y_SHIFT, 0);
+            wrist.position.set(
+                lowerArm.position.x + Math.cos(armRotation + baseRotation),
+                lowerArm.position.y - 1.5,  // Shift 1.5 units below
+                lowerArm.position.z + Math.sin(armRotation + baseRotation),
+            );
+            wrist.setRotationFromEuler(new THREE.Euler(0, Math.PI - baseRotation - armRotation - wristRotation));
 
+            // Attachment point for the jaw is the same as wrist, just lower.
+            // Again, center inscribes a unit circle on top of this.
             const jawGeometry = new THREE.BoxGeometry(3, 0.25, 0.25);
             const jaw = new THREE.Mesh(jawGeometry, this.material);
-            jaw.position.set(5, 0.45 + this.Y_SHIFT, 0);
+            jaw.position.set(
+                wrist.position.x + Math.cos(wristRotation + armRotation + baseRotation),
+                wrist.position.y - 1.05,
+                wrist.position.z + Math.sin(wristRotation + armRotation + baseRotation),
+            )
+            jaw.setRotationFromEuler(new THREE.Euler(0, Math.PI - baseRotation - armRotation - wristRotation));
 
             this.group.add(body, upperArm, lowerArm, wrist, jaw);
         }
