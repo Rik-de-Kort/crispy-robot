@@ -7,6 +7,11 @@
     let canvas: HTMLCanvasElement;
     let crane = new CraneModel();
 
+    let {craneState} = $props();
+    $effect(() => {
+        crane.update(craneState);
+    })
+
     onMount(() => {
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(
@@ -38,18 +43,8 @@
         }
     });
 
-    function changeCrane() {
-        crane.update({
-            swing_rotation: 0,
-            lift_elevation: 1000,
-            elbow_rotation: 45,
-            wrist_rotation: 0,
-            gripper_open: 0,
-        })
-    }
 </script>
 
-<button on:click={changeCrane}>click</button>
 <canvas bind:this={canvas}></canvas>
 
 <style>

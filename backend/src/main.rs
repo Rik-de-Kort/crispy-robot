@@ -38,6 +38,7 @@ async fn main() -> Result<(), Error> {
         swing_rotation: Degrees(0),
         lift_elevation: Millimeters(0),
         elbow_rotation: Degrees(0),
+        wrist_rotation: Degrees(0),
         gripper_open: Millimeters(0),
     }));
 
