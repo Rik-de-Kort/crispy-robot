@@ -8,9 +8,10 @@ edition = "2021"
 # Downside is I'll have to eat the cost of async programming. Then again, maybe in real life you want to have
 #  a single server for multiple clients, so this might come in handy.
 tokio = { version = "1", features = ["full"] }  # tutorial setup
-tokio-tungstenite="0.24.0"
+tokio-tungstenite = "0.24.0"
 futures-util = "0.3.31"
 log = "0.4.22"
 env_logger = "0.11.5"
 serde = { version = "1.0.215", features = ["derive"] }
 serde_json = "1.0.133"
+derive_more = { version = "1.0.0", features = ["full"] }
