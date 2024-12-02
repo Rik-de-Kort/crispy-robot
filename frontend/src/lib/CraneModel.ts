@@ -45,7 +45,7 @@ export class CraneModel {
     }
 
     constructor() {
-        this.bodyHeight = 12;
+        this.bodyHeight = 12;  // Todo: should be redundant, should be able to read from body directly
         this.group = new THREE.Group()
         this.material = new THREE.MeshBasicMaterial({color: 0x00ff00});
 

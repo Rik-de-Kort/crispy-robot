@@ -23,6 +23,7 @@ impl AddAssign for Degrees {
 impl SubAssign for Degrees {
     fn sub_assign(&mut self, rhs: Self) {
         if self.0 < rhs.0 {
+            // self is always < 360 and so is rhs, so this works!
             self.0 = (360 + self.0 - rhs.0) % 360;
         } else {
             self.0 = (self.0 - rhs.0) % 360;
@@ -165,6 +166,7 @@ async fn accept_connection(stream: TcpStream, crane: Crane) -> Result<()> {
     let mut interval = tokio::time::interval(Duration::from_millis(16));
     loop {
         tokio::select! {
+            // Task that accepts commands
             msg = read.next() => {
                 match msg {
                     Some(msg) => {
@@ -190,6 +192,7 @@ async fn accept_connection(stream: TcpStream, crane: Crane) -> Result<()> {
                     None => break,
                 }
             }
+            // Task that sends the crane state to the frontend
             _ = interval.tick() => {
                 let msg = {
                     // Todo: error handling here
